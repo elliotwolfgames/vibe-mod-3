@@ -1,6 +1,7 @@
 import type { ModuleConfig } from "./configuration"
 import type { AppActions } from './actions'
 import { ModuleResultType, ModuleResult, BaseActions } from 'wolfy-module-kit'
+import { AppActionsSchema } from './actions'
 
 // DO NOT MODIFY FROZEN REGION BELOW
 // region Frozen
@@ -27,14 +28,24 @@ export function interpretResult(
 
   // Default action is "done"
   // This will change based on how the module wants to handle its result
-  let actionToTrigger = BaseActions.Done
+  let actionToTrigger: AppActions = BaseActions.Done
 
   // endregion Frozen
 
-  // Example: 
-  // if (config.expectedResultType === ModuleResultType.Attempt) {
-  //   actionToTrigger = BaseActions.AnotherAction
-  // }
+  // Determine action based on game completion for hidden object detective game
+  if (resultData?.gameType === 'hidden_object_investigation') {
+    if (resultData.detailsForParent?.investigationComplete) {
+      actionToTrigger = AppActionsSchema.enum.CaseSolvedPerfect;
+    } else if (resultData.completed && resultData.detailsForParent?.suspectIdentified) {
+      actionToTrigger = AppActionsSchema.enum.CaseSolved;
+    } else if (resultData.completed) {
+      actionToTrigger = AppActionsSchema.enum.CasePartiallyResolved;
+    } else if (resultData.timeExpired) {
+      actionToTrigger = AppActionsSchema.enum.TimeExpired;
+    } else {
+      actionToTrigger = AppActionsSchema.enum.CaseIncomplete;
+    }
+  }
 
   // DO NOT MODIFY FROZEN REGION BELOW
   // region Frozen

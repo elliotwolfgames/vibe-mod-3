@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Detective Game Demo</title>
+    <style>
+        /* Base styles */
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #000;
+            color: #fff;
+        }
+        
+        /* Game container */
+        .game-container {
+            display: grid;
+            grid-template-columns: 1fr 300px;
+            height: 100vh;
+        }
+        
+        /* Game room */
+        .game-room {
+            position: relative;
+            border: 2px solid #00ffff;
+            overflow: hidden;
+        }
+        
+        .room-background {
+            background-image: url('images/detective-apartment.jpg');
+            background-size: cover;
+            background-position: center;
+            width: 100%;
+            height: 600px;
+            position: relative;
+        }
+        
+        /* Hotspots */
+        .hotspot {
+            position: absolute;
+            border: 2px solid rgba(0, 255, 255, 0.3);
+            border-radius: 4px;
+            cursor: pointer;
+            background-color: rgba(0, 255, 255, 0.1);
+            box-shadow: 0 0 10px rgba(0, 255, 255, 0.2);
+            transition: all 0.3s ease;
+        }
+        
+        .hotspot:hover {
+            border-color: rgba(0, 255, 255, 0.8);
+            background-color: rgba(0, 255, 255, 0.2);
+            box-shadow: 0 0 15px rgba(0, 255, 255, 0.5);
+        }
+        
+        .hotspot.found {
+            border-color: rgba(0, 255, 65, 0.8);
+            background-color: rgba(0, 255, 65, 0.3);
+            box-shadow: 0 0 15px rgba(0, 255, 65, 0.5);
+        }
+        
+        .hotspot.hint {
+            border-color: rgba(255, 0, 64, 0.8);
+            background-color: rgba(255, 0, 64, 0.3);
+            box-shadow: 0 0 15px rgba(255, 0, 64, 0.5);
+            animation: hint-pulse 2s ease-in-out infinite;
+        }
+        
+        @keyframes hint-pulse {
+            0%, 100% { opacity: 0.8; transform: scale(1); }
+            50% { opacity: 1; transform: scale(1.05); }
+        }
+        
+        /* Game controls */
+        .game-controls {
+            background: rgba(0, 0, 0, 0.9);
+            border-top: 1px solid #00ffff;
+            padding: 15px;
+        }
+        
+        /* Evidence tracker */
+        .evidence-tracker {
+            background: linear-gradient(180deg, #1a1a1a 0%, #333333 100%);
+            border-left: 2px solid #00ffff;
+            padding: 15px;
+            overflow-y: auto;
+        }
+        
+        /* Tooltip */
+        .tooltip {
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-size: 12px;
+            white-space: nowrap;
+            opacity: 0;
+            transition: opacity 0.3s;
+            pointer-events: none;
+        }
+        
+        .hotspot:hover .tooltip {
+            opacity: 1;
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <div>
+            <div class="game-room">
+                <div class="room-background">
+                    <div style="position: absolute; top: 0; left: 0; padding: 15px; background-color: rgba(0, 0, 0, 0.7); border-bottom-right-radius: 10px;">
+                        <h2 style="color: #00ffff; margin: 0 0 5px 0;">Detective's Apartment</h2>
+                        <p style="margin: 0; font-size: 14px; opacity: 0.8;">A cluttered apartment belonging to Detective Sarah Chen. Something doesn't feel right...</p>
+                    </div>
+                    
+                    <!-- Laptop Hotspot -->
+                    <div class="hotspot" style="left: 38%; top: 29%; width: 8%; height: 6%;">
+                        <div class="tooltip">Laptop Computer</div>
+                    </div>
+                    
+                    <!-- Security Camera Footage Hotspot -->
+                    <div class="hotspot" style="left: 13%; top: 13%; width: 6%; height: 4%;">
+                        <div class="tooltip">Security Camera Footage</div>
+                    </div>
+                    
+                    <!-- Journal Hotspot -->
+                    <div class="hotspot found" style="left: 42%; top: 50%; width: 5%; height: 7%;">
+                        <div class="tooltip">Found: Personal Journal</div>
+                        <div style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;">
+                            <span style="color: #00ff41; font-weight: bold; font-size: 18px;">✓</span>
+                        </div>
+                    </div>
+                    
+                    <!-- Phone Hotspot -->
+                    <div class="hotspot" style="left: 75%; top: 29%; width: 4%; height: 6%;">
+                        <div class="tooltip">Mobile Phone</div>
+                    </div>
+                    
+                    <!-- Coffee Cup Hotspot -->
+                    <div class="hotspot hint" style="left: 50%; top: 29%; width: 3%; height: 4%;">
+                        <div class="tooltip">Coffee Cup</div>
+                    </div>
+                    
+                    <!-- Business Card Hotspot -->
+                    <div class="hotspot" style="left: 29%; top: 29%; width: 4%; height: 3%;">
+                        <div class="tooltip">Business Card</div>
+                    </div>
+                    
+                    <!-- Red Bird Statue Hotspot -->
+                    <div class="hotspot" style="left: 10%; top: 50%; width: 5%; height: 6%;">
+                        <div class="tooltip">Red Bird Statue</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="game-controls">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <div style="display: flex; align-items: center; gap: 20px;">
+                        <h1 style="margin: 0; color: #00ffff; font-size: 24px;">Digital Detective</h1>
+                        <div>
+                            <span style="color: #999;">Evidence:</span>
+                            <span style="color: #00ffff; margin-left: 5px; font-weight: bold;">1 / 7</span>
+                        </div>
+                        <div>
+                            <span style="color: #999;">Critical:</span>
+                            <span style="color: #ff0040; margin-left: 5px; font-weight: bold;">0 / 4</span>
+                        </div>
+                    </div>
+                    
+                    <button style="background: transparent; border: 2px solid #ffff00; color: #ffff00; padding: 8px 16px; border-radius: 4px; cursor: pointer;">
+                        💡 Hints: 2
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <div class="evidence-tracker">
+            <h3 style="text-align: center; color: #00ffff; margin-top: 0;">EVIDENCE BOARD</h3>
+            
+            <div style="margin-bottom: 20px;">
+                <div style="display: flex; justify-content: space-between; font-size: 14px; color: #999; margin-bottom: 5px;">
+                    <span>Investigation Progress</span>
+                    <span>1/7</span>
+                </div>
+                <div style="height: 8px; background-color: #333; border-radius: 4px; overflow: hidden;">
+                    <div style="width: 14%; height: 100%; background: linear-gradient(90deg, #00ffff 0%, #00ff41 100%);"></div>
+                </div>
+            </div>
+            
+            <div style="background-color: #333; border: 1px solid #666; border-radius: 4px; padding: 15px; margin-bottom: 10px;">
+                <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                    <h4 style="margin: 0; color: white; font-size: 14px;">Personal Journal Entry</h4>
+                    <span style="background-color: #ffff00; color: black; font-size: 10px; padding: 2px 8px; border-radius: 12px;">supporting</span>
+                </div>
+                <p style="font-size: 12px; color: #999; margin-bottom: 10px;">Handwritten notes in victim's personal journal</p>
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <span style="background-color: #ffff00; color: black; font-size: 10px; padding: 2px 8px; border-radius: 12px;">document</span>
+                    <span style="font-size: 10px; color: #666;">🕐 2024-01-15 08:00</span>
+                </div>
+            </div>
+            
+            <div style="margin-top: 20px; padding: 12px; background-color: #1a1a1a; border: 1px solid #ff0040; border-radius: 4px;">
+                <h4 style="color: #ff0040; font-size: 12px; margin-top: 0; margin-bottom: 10px;">🔍 INVESTIGATION NOTES</h4>
+                <p style="font-size: 12px; color: #ccc; line-height: 1.5; margin-bottom: 10px;">
+                    Sarah's final journal entry, written the morning of her death, reveals her growing paranoia: "I know someone is watching me. The files I found prove everything - the missing money, the fake contracts, the offshore accounts. M thinks I don't know, but I've been documenting everything. If something happens to me, the truth is hidden where only I would think to look. The red bird knows the way."
+                </p>
+                <p style="font-size: 10px; color: #666; margin-bottom: 0;">
+                    📍 Location: Victim's apartment
+                </p>
+                <p style="font-size: 10px; color: #00ffff; margin-bottom: 0; margin-top: 5px;">
+                    🔗 Connected to 2 other clue(s)
+                </p>
+            </div>
+            
+            <div style="margin-top: 20px; padding: 10px; background-color: #333; border-radius: 4px; font-size: 12px;">
+                <h4 style="color: #999; margin-top: 0; margin-bottom: 8px; font-weight: bold;">CASE STATUS</h4>
+                <div style="line-height: 1.5;">
+                    <p style="color: #666; margin: 0;">Status: <span style="color: #00ffff;">playing</span></p>
+                    <p style="color: #666; margin: 0;">Clicks: <span style="color: white;">0</span></p>
+                    <p style="color: #666; margin: 0;">Scene: <span style="color: white;">detective_apartment</span></p>
+                    <p style="color: #666; margin: 0;">Difficulty: <span style="color: white;">medium</span></p>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

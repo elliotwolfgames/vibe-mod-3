@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Detective Apartment Scene</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #000;
+            color: #fff;
+            font-family: Arial, sans-serif;
+        }
+        
+        .apartment-scene {
+            width: 1200px;
+            height: 800px;
+            position: relative;
+            background: linear-gradient(to bottom, #1a1a1a, #333);
+            overflow: hidden;
+        }
+        
+        /* Walls and floor */
+        .wall {
+            position: absolute;
+            background-color: #2a2a2a;
+            border: 1px solid #444;
+        }
+        
+        .wall.left {
+            width: 800px;
+            height: 500px;
+            left: 0;
+            top: 0;
+            transform: perspective(800px) rotateY(10deg);
+            background: linear-gradient(to right, #1a1a1a, #2a2a2a);
+        }
+        
+        .wall.right {
+            width: 600px;
+            height: 500px;
+            right: 0;
+            top: 0;
+            transform: perspective(800px) rotateY(-10deg);
+            background: linear-gradient(to left, #1a1a1a, #2a2a2a);
+        }
+        
+        .floor {
+            position: absolute;
+            width: 1200px;
+            height: 300px;
+            bottom: 0;
+            background: linear-gradient(to bottom, #333, #222);
+            border-top: 2px solid #444;
+        }
+        
+        /* Furniture */
+        .desk {
+            position: absolute;
+            width: 300px;
+            height: 80px;
+            left: 400px;
+            bottom: 150px;
+            background-color: #4a3520;
+            border: 2px solid #5a4530;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+        }
+        
+        .desk::before {
+            content: '';
+            position: absolute;
+            width: 280px;
+            height: 10px;
+            top: -10px;
+            left: 10px;
+            background-color: #5a4530;
+        }
+        
+        .desk-leg {
+            position: absolute;
+            width: 20px;
+            height: 70px;
+            bottom: 0;
+            background-color: #3a2510;
+        }
+        
+        .desk-leg.left {
+            left: 30px;
+        }
+        
+        .desk-leg.right {
+            right: 30px;
+        }
+        
+        .laptop {
+            position: absolute;
+            width: 120px;
+            height: 80px;
+            left: 450px;
+            bottom: 230px;
+            background-color: #333;
+            border: 2px solid #444;
+            transform: perspective(500px) rotateX(70deg);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+        }
+        
+        .laptop::before {
+            content: '';
+            position: absolute;
+            width: 120px;
+            height: 80px;
+            top: -80px;
+            left: 0;
+            background-color: #222;
+            border: 2px solid #444;
+            transform: perspective(500px) rotateX(10deg);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+        }
+        
+        .laptop-screen {
+            position: absolute;
+            width: 100px;
+            height: 60px;
+            top: -70px;
+            left: 10px;
+            background-color: #007bff;
+            opacity: 0.7;
+        }
+        
+        .coffee-cup {
+            position: absolute;
+            width: 30px;
+            height: 40px;
+            left: 600px;
+            bottom: 230px;
+            background-color: #fff;
+            border-radius: 0 0 15px 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+        }
+        
+        .coffee-cup::before {
+            content: '';
+            position: absolute;
+            width: 40px;
+            height: 20px;
+            top: 5px;
+            left: 25px;
+            background-color: #fff;
+            border-radius: 10px;
+            transform: rotate(30deg);
+        }
+        
+        .coffee-cup::after {
+            content: '';
+            position: absolute;
+            width: 20px;
+            height: 5px;
+            top: -5px;
+            left: 5px;
+            background-color: #6b4226;
+        }
+        
+        .bookshelf {
+            position: absolute;
+            width: 200px;
+            height: 400px;
+            left: 100px;
+            bottom: 150px;
+            background-color: #4a3520;
+            border: 2px solid #5a4530;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+        }
+        
+        .shelf {
+            position: absolute;
+            width: 190px;
+            height: 10px;
+            left: 5px;
+            background-color: #5a4530;
+        }
+        
+        .shelf:nth-child(1) { top: 80px; }
+        .shelf:nth-child(2) { top: 160px; }
+        .shelf:nth-child(3) { top: 240px; }
+        .shelf:nth-child(4) { top: 320px; }
+        
+        .book {
+            position: absolute;
+            width: 20px;
+            height: 60px;
+            bottom: 320px;
+            background-color: #f00;
+        }
+        
+        .book:nth-child(5) { left: 110px; background-color: #f00; }
+        .book:nth-child(6) { left: 135px; background-color: #0f0; }
+        .book:nth-child(7) { left: 160px; background-color: #00f; }
+        .book:nth-child(8) { left: 185px; background-color: #ff0; }
+        
+        .book:nth-child(9) { left: 110px; bottom: 240px; background-color: #f0f; }
+        .book:nth-child(10) { left: 135px; bottom: 240px; background-color: #0ff; }
+        .book:nth-child(11) { left: 160px; bottom: 240px; background-color: #840; }
+        .book:nth-child(12) { left: 185px; bottom: 240px; background-color: #084; }
+        
+        .red-bird-statue {
+            position: absolute;
+            width: 50px;
+            height: 80px;
+            left: 125px;
+            bottom: 400px;
+            background-color: #f00;
+            clip-path: polygon(50% 0%, 100% 50%, 80% 100%, 20% 100%, 0% 50%);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+        }
+        
+        .red-bird-statue::before {
+            content: '';
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            top: 15px;
+            left: 15px;
+            background-color: #ff0;
+            border-radius: 50%;
+        }
+        
+        .phone {
+            position: absolute;
+            width: 40px;
+            height: 70px;
+            right: 300px;
+            bottom: 230px;
+            background-color: #000;
+            border: 2px solid #444;
+            border-radius: 5px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+        }
+        
+        .phone::before {
+            content: '';
+            position: absolute;
+            width: 30px;
+            height: 50px;
+            top: 10px;
+            left: 5px;
+            background-color: #007bff;
+            opacity: 0.7;
+            border-radius: 2px;
+        }
+        
+        .business-card {
+            position: absolute;
+            width: 60px;
+            height: 40px;
+            left: 350px;
+            bottom: 230px;
+            background-color: #fff;
+            transform: rotate(-10deg);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+        }
+        
+        .business-card::before {
+            content: '';
+            position: absolute;
+            width: 40px;
+            height: 5px;
+            top: 10px;
+            left: 10px;
+            background-color: #000;
+        }
+        
+        .business-card::after {
+            content: '';
+            position: absolute;
+            width: 40px;
+            height: 5px;
+            top: 20px;
+            left: 10px;
+            background-color: #000;
+        }
+        
+        .security-camera {
+            position: absolute;
+            width: 60px;
+            height: 40px;
+            left: 150px;
+            top: 100px;
+            background-color: #333;
+            border: 2px solid #444;
+            border-radius: 5px;
+            transform: rotate(20deg);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+        }
+        
+        .security-camera::before {
+            content: '';
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            top: 10px;
+            left: 20px;
+            background-color: #000;
+            border-radius: 50%;
+        }
+        
+        .security-camera::after {
+            content: '';
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            top: 15px;
+            left: 25px;
+            background-color: #f00;
+            border-radius: 50%;
+            animation: blink 2s infinite;
+        }
+        
+        .journal {
+            position: absolute;
+            width: 80px;
+            height: 100px;
+            left: 500px;
+            bottom: 400px;
+            background-color: #840;
+            transform: rotate(10deg);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+        }
+        
+        .journal::before {
+            content: '';
+            position: absolute;
+            width: 60px;
+            height: 80px;
+            top: 10px;
+            left: 10px;
+            background-color: #fff;
+            opacity: 0.7;
+        }
+        
+        .journal::after {
+            content: '';
+            position: absolute;
+            width: 40px;
+            height: 5px;
+            top: 20px;
+            left: 20px;
+            background-color: #000;
+            box-shadow: 0 10px 0 #000, 0 20px 0 #000, 0 30px 0 #000, 0 40px 0 #000;
+        }
+        
+        /* Window */
+        .window {
+            position: absolute;
+            width: 200px;
+            height: 300px;
+            right: 200px;
+            top: 50px;
+            background-color: #007bff;
+            opacity: 0.2;
+            border: 5px solid #444;
+            box-shadow: 0 0 20px rgba(0, 255, 255, 0.3);
+        }
+        
+        .window::before {
+            content: '';
+            position: absolute;
+            width: 5px;
+            height: 300px;
+            left: 97px;
+            background-color: #444;
+        }
+        
+        .window::after {
+            content: '';
+            position: absolute;
+            width: 200px;
+            height: 5px;
+            top: 147px;
+            background-color: #444;
+        }
+        
+        /* Lighting effects */
+        .light {
+            position: absolute;
+            width: 300px;
+            height: 300px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.2) 0%, rgba(255, 255, 255, 0) 70%);
+            pointer-events: none;
+        }
+        
+        .light.desk {
+            left: 450px;
+            bottom: 300px;
+        }
+        
+        .light.window {
+            right: 200px;
+            top: 50px;
+            background: radial-gradient(circle, rgba(0, 255, 255, 0.2) 0%, rgba(0, 255, 255, 0) 70%);
+        }
+        
+        @keyframes blink {
+            0%, 49% { opacity: 0; }
+            50%, 100% { opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+    <div class="apartment-scene">
+        <!-- Walls and floor -->
+        <div class="wall left"></div>
+        <div class="wall right"></div>
+        <div class="floor"></div>
+        
+        <!-- Furniture and objects -->
+        <div class="desk">
+            <div class="desk-leg left"></div>
+            <div class="desk-leg right"></div>
+        </div>
+        
+        <div class="laptop">
+            <div class="laptop-screen"></div>
+        </div>
+        
+        <div class="coffee-cup"></div>
+        
+        <div class="bookshelf">
+            <div class="shelf"></div>
+            <div class="shelf"></div>
+            <div class="shelf"></div>
+            <div class="shelf"></div>
+            <div class="book"></div>
+            <div class="book"></div>
+            <div class="book"></div>
+            <div class="book"></div>
+            <div class="book"></div>
+            <div class="book"></div>
+            <div class="book"></div>
+            <div class="book"></div>
+        </div>
+        
+        <div class="red-bird-statue"></div>
+        
+        <div class="phone"></div>
+        
+        <div class="business-card"></div>
+        
+        <div class="security-camera"></div>
+        
+        <div class="journal"></div>
+        
+        <div class="window"></div>
+        
+        <!-- Lighting effects -->
+        <div class="light desk"></div>
+        <div class="light window"></div>
+    </div>
+</body>
+</html>

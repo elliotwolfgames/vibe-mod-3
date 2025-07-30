@@ -1,0 +1,464 @@
+/* Hidden Object Detective Game - Sin City Aesthetic */
+
+/* Import fonts for the noir theme */
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Rajdhani:wght@300;400;500;600;700&display=swap');
+
+/* CSS Variables for Sin City Theme */
+:root {
+  /* Sin City Core Colors */
+  --sin-city-black: #000000;
+  --sin-city-white: #ffffff;
+  --neon-red: #ff0040;
+  --neon-blue: #00ffff;
+  --neon-green: #00ff41;
+  --neon-yellow: #ffff00;
+  
+  /* Noir Grays */
+  --noir-dark: #1a1a1a;
+  --noir-medium: #333333;
+  --noir-light: #666666;
+  --noir-smoke: #999999;
+  
+  /* Typography */
+  --font-primary: 'Orbitron', monospace;
+  --font-secondary: 'Rajdhani', sans-serif;
+}
+
+/* Base game container */
+.hidden-object-game {
+  background: linear-gradient(135deg, var(--noir-dark) 0%, var(--sin-city-black) 100%);
+  color: var(--sin-city-white);
+  font-family: var(--font-secondary);
+  min-height: 100vh;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Scan lines effect overlay */
+.hidden-object-game::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(0, 255, 255, 0.03) 2px,
+    rgba(0, 255, 255, 0.03) 4px
+  );
+  pointer-events: none;
+  z-index: 1000;
+}
+
+/* Game container layout */
+.game-container {
+  display: grid;
+  grid-template-columns: 1fr 300px;
+  height: 100vh;
+  gap: 0;
+}
+
+@media (max-width: 1024px) {
+  .game-container {
+    grid-template-columns: 1fr;
+    grid-template-rows: 1fr auto;
+  }
+}
+
+/* Game room styling */
+.game-room {
+  position: relative;
+  background: var(--noir-dark);
+  border: 2px solid var(--neon-blue);
+  overflow: hidden;
+  cursor: crosshair;
+}
+
+.room-background {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: contrast(1.2) brightness(0.9);
+  transition: filter 0.3s ease;
+}
+
+.room-background:hover {
+  filter: contrast(1.3) brightness(1.0);
+}
+
+/* Hotspot styling */
+.hotspot {
+  position: absolute;
+  border: 2px solid transparent;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  z-index: 10;
+}
+
+.hotspot:hover {
+  border-color: var(--neon-blue);
+  background: rgba(0, 255, 255, 0.1);
+  box-shadow: 
+    0 0 10px rgba(0, 255, 255, 0.3),
+    inset 0 0 10px rgba(0, 255, 255, 0.1);
+  transform: scale(1.02);
+}
+
+.hotspot.found {
+  border-color: var(--neon-green);
+  background: rgba(0, 255, 65, 0.2);
+  cursor: default;
+  box-shadow: 0 0 15px rgba(0, 255, 65, 0.4);
+}
+
+.hotspot.hint {
+  border-color: var(--neon-red);
+  background: rgba(255, 0, 64, 0.2);
+  animation: hint-pulse 2s ease-in-out infinite;
+  box-shadow: 
+    0 0 15px rgba(255, 0, 64, 0.4),
+    0 0 30px rgba(255, 0, 64, 0.2);
+}
+
+@keyframes hint-pulse {
+  0%, 100% { 
+    opacity: 0.8;
+    transform: scale(1);
+  }
+  50% { 
+    opacity: 1;
+    transform: scale(1.05);
+  }
+}
+
+/* Game controls */
+.game-controls {
+  background: rgba(0, 0, 0, 0.9);
+  border-top: 1px solid var(--neon-blue);
+  backdrop-filter: blur(10px);
+}
+
+.game-controls h1 {
+  font-family: var(--font-primary);
+  text-shadow: 0 0 10px var(--neon-blue);
+  letter-spacing: 2px;
+}
+
+/* Evidence tracker sidebar */
+.evidence-tracker {
+  background: linear-gradient(180deg, var(--noir-dark) 0%, var(--noir-medium) 100%);
+  border-left: 2px solid var(--neon-blue);
+  position: relative;
+}
+
+.evidence-tracker h3 {
+  font-family: var(--font-primary);
+  text-shadow: 0 0 10px var(--neon-blue);
+  letter-spacing: 2px;
+}
+
+/* Progress bar */
+.progress-bar {
+  background: var(--noir-medium);
+  border-radius: 4px;
+  overflow: hidden;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.progress-fill {
+  background: linear-gradient(90deg, var(--neon-blue) 0%, var(--neon-green) 100%);
+  transition: width 0.5s ease;
+  box-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
+  position: relative;
+}
+
+.progress-fill::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.2) 50%, transparent 100%);
+  animation: progress-shine 2s ease-in-out infinite;
+}
+
+@keyframes progress-shine {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+/* Clue items */
+.clue-item {
+  background: var(--noir-medium);
+  border: 1px solid var(--noir-light);
+  border-radius: 4px;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.clue-item::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(0, 255, 255, 0.1), transparent);
+  transition: left 0.5s ease;
+}
+
+.clue-item:hover::before {
+  left: 100%;
+}
+
+.clue-item:hover {
+  border-color: var(--neon-blue);
+  background: var(--noir-dark);
+  box-shadow: 0 0 5px rgba(0, 255, 255, 0.3);
+  transform: translateY(-2px);
+}
+
+.clue-item.selected {
+  border-color: var(--neon-red);
+  background: var(--noir-dark);
+  box-shadow: 0 0 10px rgba(255, 0, 64, 0.3);
+}
+
+/* Evidence type badges */
+.evidence-type-badge {
+  font-size: 0.75rem;
+  padding: 0.125rem 0.5rem;
+  border-radius: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.evidence-type-badge.digital {
+  background: var(--neon-blue);
+  color: var(--sin-city-black);
+  box-shadow: 0 0 5px rgba(0, 255, 255, 0.5);
+}
+
+.evidence-type-badge.document {
+  background: var(--neon-yellow);
+  color: var(--sin-city-black);
+  box-shadow: 0 0 5px rgba(255, 255, 0, 0.5);
+}
+
+.evidence-type-badge.physical {
+  background: var(--neon-green);
+  color: var(--sin-city-black);
+  box-shadow: 0 0 5px rgba(0, 255, 65, 0.5);
+}
+
+.evidence-type-badge.surveillance {
+  background: var(--neon-red);
+  color: var(--sin-city-white);
+  box-shadow: 0 0 5px rgba(255, 0, 64, 0.5);
+}
+
+/* Importance badges */
+.importance-badge.critical {
+  background: var(--neon-red);
+  color: var(--sin-city-white);
+  animation: critical-glow 2s ease-in-out infinite;
+}
+
+.importance-badge.supporting {
+  background: var(--neon-yellow);
+  color: var(--sin-city-black);
+}
+
+.importance-badge.background {
+  background: var(--noir-light);
+  color: var(--sin-city-white);
+}
+
+@keyframes critical-glow {
+  0%, 100% { box-shadow: 0 0 5px rgba(255, 0, 64, 0.5); }
+  50% { box-shadow: 0 0 15px rgba(255, 0, 64, 0.8); }
+}
+
+/* Buttons */
+.neon-button {
+  background: transparent;
+  border: 2px solid var(--neon-blue);
+  color: var(--neon-blue);
+  font-family: var(--font-primary);
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-weight: 600;
+}
+
+.neon-button:hover {
+  background: var(--neon-blue);
+  color: var(--sin-city-black);
+  box-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
+  text-shadow: none;
+}
+
+.neon-button:disabled {
+  border-color: var(--noir-light);
+  color: var(--noir-light);
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+.neon-button.danger {
+  border-color: var(--neon-red);
+  color: var(--neon-red);
+}
+
+.neon-button.danger:hover {
+  background: var(--neon-red);
+  color: var(--sin-city-white);
+  box-shadow: 0 0 10px rgba(255, 0, 64, 0.5);
+}
+
+.neon-button.warning {
+  border-color: var(--neon-yellow);
+  color: var(--neon-yellow);
+}
+
+.neon-button.warning:hover {
+  background: var(--neon-yellow);
+  color: var(--sin-city-black);
+  box-shadow: 0 0 10px rgba(255, 255, 0, 0.5);
+}
+
+/* Timer styling */
+.game-timer {
+  font-family: var(--font-primary);
+  font-weight: 700;
+  text-shadow: 0 0 5px currentColor;
+}
+
+.game-timer.warning {
+  color: var(--neon-yellow);
+  animation: timer-warning 1s ease-in-out infinite;
+}
+
+.game-timer.danger {
+  color: var(--neon-red);
+  animation: timer-danger 0.5s ease-in-out infinite;
+}
+
+@keyframes timer-warning {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
+}
+
+@keyframes timer-danger {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.8; transform: scale(1.05); }
+}
+
+/* Loading animations */
+.loading-spinner {
+  border: 2px solid var(--noir-medium);
+  border-top: 2px solid var(--neon-blue);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Glitch effect for special moments */
+.glitch-effect {
+  animation: glitch 0.3s ease-in-out;
+}
+
+@keyframes glitch {
+  0% { transform: translate(0); }
+  20% { transform: translate(-2px, 2px); }
+  40% { transform: translate(-2px, -2px); }
+  60% { transform: translate(2px, 2px); }
+  80% { transform: translate(2px, -2px); }
+  100% { transform: translate(0); }
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .game-container {
+    grid-template-columns: 1fr;
+  }
+  
+  .evidence-tracker {
+    max-height: 40vh;
+    border-left: none;
+    border-top: 2px solid var(--neon-blue);
+  }
+  
+  .game-controls {
+    padding: 1rem;
+  }
+  
+  .game-controls .flex {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+}
+
+/* Accessibility improvements */
+@media (prefers-reduced-motion: reduce) {
+  .hotspot,
+  .clue-item,
+  .progress-fill,
+  .neon-button {
+    transition: none;
+  }
+  
+  .hint-pulse,
+  .critical-glow,
+  .timer-warning,
+  .timer-danger,
+  .progress-shine {
+    animation: none;
+  }
+}
+
+/* High contrast mode */
+@media (prefers-contrast: high) {
+  :root {
+    --neon-blue: #ffffff;
+    --neon-red: #ffffff;
+    --neon-green: #ffffff;
+    --neon-yellow: #ffffff;
+  }
+  
+  .hotspot:hover {
+    background: rgba(255, 255, 255, 0.3);
+  }
+}
+
+/* Focus styles for keyboard navigation */
+.hotspot:focus,
+.clue-item:focus,
+.neon-button:focus {
+  outline: 2px solid var(--neon-blue);
+  outline-offset: 2px;
+}
+
+/* Print styles (hide interactive elements) */
+@media print {
+  .hotspot,
+  .game-controls,
+  .neon-button {
+    display: none;
+  }
+}
